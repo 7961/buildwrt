@@ -1,0 +1,83 @@
+name: Build for ssh
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Free up disk space
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo apt-get clean
+        df -h
+
+    - name: Setup build environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+          bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib \
+          g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev \
+          libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev \
+          libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool llvm lrzsz msmtp nano \
+          ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-pyelftools \
+          python3-setuptools qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs \
+          unzip upx-ucl vim wget xmlto xxd zlib1g-dev zstd
+
+    - name: Clone source code
+      run: |
+        git clone --branch v25.12.5 https://github.com/openwrt/openwrt.git openwrt
+        cd openwrt
+        git_log=$(git log --oneline -1)
+        echo "Source commit: $git_log"
+        
+    - name: load custom files
+      run: |
+        mv -f target/linux/mediatek/dts/* immortalwrt/target/linux/mediatek/dts/
+        mv -f target/linux/mediatek/filogic/base-files/etc/board.d/02_network immortalwrt/target/linux/mediatek/filogic/base-files/etc/board.d/
+        mv -f target/linux/mediatek/filogic/base-files/etc/hotplug.d/ieee80211/11_fix_wifi_mac immortalwrt/target/linux/mediatek/filogic/base-files/etc//hotplug.d/ieee80211/
+        sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301*|\\' immortalwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
+        mv -f target/linux/mediatek/image/filogic.mk immortalwrt/target/linux/mediatek/image/
+        cat immortalwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
+
+    - name: load toolchain
+      run: |
+        wget https://downloads.openwrt.org/releases/25.12.5/targets/mediatek/filogic/openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+        tar -I zstd -xvf openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+        
+    - name: Update feeds
+      run: |
+        cd immortalwrt
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+        
+    - name: Start SSH service
+      uses: mxschmitt/action-tmate@v3
+      timeout-minutes: 40
+
+    - name: show config(diff)
+      run: |
+        cd immortalwrt
+        make defconfig
+        ./scripts/diffconfig.sh > wma301.config
+        cat wma301.config
+      
+    - name: Upload config before build
+      uses: actions/upload-artifact@v4
+      with:
+          name: config-before-build
+          path: |
+            immortalwrt/wma301.config
+            
+    - name: Build ImmortalWrt
+      working-directory: immortalwrt
+      run: make -j$(nproc)
+    
+    - name: Upload build result to Artifact
+      uses: actions/upload-artifact@v4
+      with:
+          name: ImmortalWrt-build-result
+          path: immortalwrt/bin/targets
