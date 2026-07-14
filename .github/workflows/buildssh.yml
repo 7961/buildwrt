@@ -43,6 +43,10 @@ jobs:
       run: |
         wget https://downloads.openwrt.org/releases/25.12.5/targets/mediatek/filogic/openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
         tar -I zstd -xvf openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+        mv openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64 toolchain
+        rm -rf openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+        ls
+        pwd
         
     - name: Update feeds
       run: |
