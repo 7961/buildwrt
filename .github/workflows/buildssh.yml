@@ -30,18 +30,14 @@ jobs:
     - name: Clone source code
       run: |
         git clone --branch v25.12.5 https://github.com/openwrt/openwrt.git openwrt
-        cd openwrt
-        git_log=$(git log --oneline -1)
-        echo "Source commit: $git_log"
         
     - name: load custom files
       run: |
-        mv -f target/linux/mediatek/dts/* immortalwrt/target/linux/mediatek/dts/
-        mv -f target/linux/mediatek/filogic/base-files/etc/board.d/02_network immortalwrt/target/linux/mediatek/filogic/base-files/etc/board.d/
-        mv -f target/linux/mediatek/filogic/base-files/etc/hotplug.d/ieee80211/11_fix_wifi_mac immortalwrt/target/linux/mediatek/filogic/base-files/etc//hotplug.d/ieee80211/
-        sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301*|\\' immortalwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
-        mv -f target/linux/mediatek/image/filogic.mk immortalwrt/target/linux/mediatek/image/
-        cat immortalwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
+        mv -f target/linux/mediatek/dts/* openwrt/target/linux/mediatek/dts/
+        mv -f target/linux/mediatek/filogic/base-files/etc/board.d/02_network openwrt/target/linux/mediatek/filogic/base-files/etc/board.d/
+        mv -f target/linux/mediatek/filogic/base-files/etc/hotplug.d/ieee80211/11_fix_wifi_mac openwrt/target/linux/mediatek/filogic/base-files/etc//hotplug.d/ieee80211/
+        sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301*|\\' openwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
+        mv -f target/linux/mediatek/image/filogic.mk openwrt/target/linux/mediatek/image/
 
     - name: load toolchain
       run: |
@@ -50,7 +46,7 @@ jobs:
         
     - name: Update feeds
       run: |
-        cd immortalwrt
+        cd openwrt
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         
@@ -60,7 +56,7 @@ jobs:
 
     - name: show config(diff)
       run: |
-        cd immortalwrt
+        cd openwrt
         make defconfig
         ./scripts/diffconfig.sh > wma301.config
         cat wma301.config
@@ -70,14 +66,5 @@ jobs:
       with:
           name: config-before-build
           path: |
-            immortalwrt/wma301.config
+            openwrt/wma301.config
             
-    - name: Build ImmortalWrt
-      working-directory: immortalwrt
-      run: make -j$(nproc)
-    
-    - name: Upload build result to Artifact
-      uses: actions/upload-artifact@v4
-      with:
-          name: ImmortalWrt-build-result
-          path: immortalwrt/bin/targets
