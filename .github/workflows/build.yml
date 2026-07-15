@@ -1,4 +1,4 @@
-name: Build ImmortalWrt for TP-Link WMA301-V2
+name: Build openwrt for TP-Link WMA301-V2
 
 on: workflow_dispatch
 
@@ -39,57 +39,58 @@ jobs:
 
     - name: Clone source code
       run: |
-        git clone https://github.com/immortalwrt/immortalwrt.git immortalwrt
-        cd immortalwrt
-        git_log=$(git log --oneline -1)
-        echo "Source commit: $git_log"
+        git clone https://github.com/openwrt/openwrt.git openwrt
+        cd openwrt
+        git checkout v25.12.5
+        git status
         
     - name: load custom files
       run: |
-        mv -f target/linux/mediatek/dts/* immortalwrt/target/linux/mediatek/dts/
-        mv -f target/linux/mediatek/filogic/base-files/etc/board.d/02_network immortalwrt/target/linux/mediatek/filogic/base-files/etc/board.d/
-        mv -f target/linux/mediatek/filogic/base-files/etc/hotplug.d/ieee80211/11_fix_wifi_mac immortalwrt/target/linux/mediatek/filogic/base-files/etc//hotplug.d/ieee80211/
-        sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301*|\\' immortalwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
-        mv -f target/linux/mediatek/image/filogic.mk immortalwrt/target/linux/mediatek/image/
+        mv -f target/linux/mediatek/dts/* openwrt/target/linux/mediatek/dts/
+        mv -f target/linux/mediatek/filogic/base-files/etc/board.d/02_network openwrt/target/linux/mediatek/filogic/base-files/etc/board.d/
+        mv -f target/linux/mediatek/filogic/base-files/etc/hotplug.d/ieee80211/11_fix_wifi_mac openwrt/target/linux/mediatek/filogic/base-files/etc//hotplug.d/ieee80211/
+        sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301*|\\' openwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
+        mv -f target/linux/mediatek/image/filogic.mk openwrt/target/linux/mediatek/image/
+
                
     - name: Load custom config
       run: |
-        cp -f wma301.config immortalwrt/.config
+        cp -f wma301.config openwrt/.config
 
     - name: Update feeds
       run: |
-        cd immortalwrt
+        cd openwrt
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
     - name: Generate config
       run: |
-        cd immortalwrt
+        cd openwrt
         make defconfig
 
     - name: Show build config
       run: |
-        cat immortalwrt/.config
+        cat openwrt/.config
 
     - name: Download packages
       run: |
-        cd immortalwrt
+        cd openwrt
         make download -j$(nproc)
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -delete
 
     - name: Compile firmware
       run: |
-        cd immortalwrt
+        cd openwrt
         echo "Compiling with $(nproc) threads..."
-        make -j$(nproc) || make -j1 V=s
+        make -j$(nproc)
         echo "Build completed!"
         find bin/targets/ -name "*.bin" -o -name "*.itb" | head -20
 
     - name: Organize output files
       id: organize
       run: |
-        cd immortalwrt
+        cd openwrt
         FIRMWARE_DIR="${GITHUB_WORKSPACE}/firmware"
         mkdir -p "$FIRMWARE_DIR"
         # Copy all firmware images
@@ -118,7 +119,7 @@ jobs:
     - name: Generate release info
       id: release_info
       run: |
-        SOURCE_COMMIT=$(cd immortalwrt && git rev-parse --short HEAD)
+        SOURCE_COMMIT=$(cd openwrt && git rev-parse --short HEAD)
         BUILD_DATE=$(date +"%Y%m%d")
         TAG_NAME="v${BUILD_DATE}-${SOURCE_COMMIT}"
         RELEASE_TITLE="WMA301-V2 ${BUILD_DATE} (${SOURCE_COMMIT})"
@@ -133,10 +134,9 @@ jobs:
         tag_name: ${{ steps.release_info.outputs.tag_name }}
         name: ${{ steps.release_info.outputs.release_title }}
         body: |
-          ## TP-Link WMA301-V2 ImmortalWrt 固件
+          ## TP-Link WMA301-V2 OPENWRT 固件
 
           - **构建日期**: ${{ steps.release_info.outputs.release_title }}
-          - **源码**: [immortalwrt](https://github.com/immortalwrt/immortalwrt.git)
           - **源码 Commit**: `${{ steps.release_info.outputs.source_commit }}`
           - **设备**: TP-Link WMA301-V2.0 (MT7981, filogic)
           - **Workflow Run**: [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
