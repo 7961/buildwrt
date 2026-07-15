@@ -83,7 +83,7 @@ jobs:
       run: |
         cd openwrt
         echo "Compiling with $(nproc) threads..."
-        make -j$(nproc)
+        make -j$(nproc) || make -j1 V=s
         echo "Build completed!"
         find bin/targets/ -name "*.bin" -o -name "*.itb" | head -20
 
