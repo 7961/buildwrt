@@ -30,6 +30,11 @@ jobs:
     - name: Clone source code
       run: |
         git clone --branch v25.12.5 https://github.com/openwrt/openwrt.git openwrt
+        wget openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+        tar -I zstd -xf openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+        mv openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64/* /opt/
+        
+        
         
     - name: load custom files
       run: |
@@ -39,14 +44,6 @@ jobs:
         sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301*|\\' openwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
         mv -f target/linux/mediatek/image/filogic.mk openwrt/target/linux/mediatek/image/
 
-    - name: load toolchain
-      run: |
-        wget https://downloads.openwrt.org/releases/25.12.5/targets/mediatek/filogic/openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
-        tar -I zstd -xvf openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
-        mv openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64 toolchain
-        rm -rf openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
-        ls
-        pwd
         
     - name: Update feeds
       run: |
@@ -71,4 +68,18 @@ jobs:
           name: config-before-build
           path: |
             openwrt/wma301.config
-            
+
+    - name: Compile firmware
+      run: |
+        cd openwrt
+        echo "Compiling with $(nproc) threads..."
+        make -j$(nproc)
+        echo "Build completed!"
+
+    - name: Upload firmware artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: WMA301-V2-firmware
+        path: openwrt/bin/targets/
+        retention-days: 30        
+        
