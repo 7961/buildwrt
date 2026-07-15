@@ -30,6 +30,7 @@ jobs:
     - name: Clone source code
       run: |
         git clone https://github.com/openwrt/openwrt.git openwrt
+        cd openwrt
         git checkout v25.12.5
         git status
               
