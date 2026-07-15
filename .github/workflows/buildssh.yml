@@ -30,7 +30,7 @@ jobs:
     - name: Clone source code
       run: |
         git clone --branch v25.12.5 https://github.com/openwrt/openwrt.git openwrt
-        wget openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+        wget https://downloads.openwrt.org/releases/25.12.5/targets/mediatek/filogic/openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
         tar -I zstd -xf openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
         mv openwrt-toolchain-25.12.5-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64/* /opt/
         
