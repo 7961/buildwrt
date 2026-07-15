@@ -3,7 +3,7 @@ on: workflow_dispatch
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
 
     steps:
     - name: Checkout
@@ -39,7 +39,8 @@ jobs:
         mv -f target/linux/mediatek/dts/* openwrt/target/linux/mediatek/dts/
         mv -f target/linux/mediatek/filogic/base-files/etc/board.d/02_network openwrt/target/linux/mediatek/filogic/base-files/etc/board.d/
         mv -f target/linux/mediatek/filogic/base-files/etc/hotplug.d/ieee80211/11_fix_wifi_mac openwrt/target/linux/mediatek/filogic/base-files/etc//hotplug.d/ieee80211/
-        sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301*|\\' openwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
+        sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301|\\' openwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
+        sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301|\\' openwrt/package/boot/uboot-tools/uboot-envtools/files/mediatek_filogic
         mv -f target/linux/mediatek/image/filogic.mk openwrt/target/linux/mediatek/image/
 
         
@@ -56,7 +57,6 @@ jobs:
     - name: show config(diff)
       run: |
         cd openwrt
-        make defconfig
         ./scripts/diffconfig.sh > wma301.config
         cat wma301.config
       
@@ -70,8 +70,9 @@ jobs:
     - name: Compile firmware
       run: |
         cd openwrt
+        make clean
         echo "Compiling with $(nproc) threads..."
-        make -j$(nproc)
+        make -j$(nproc) || make -j1 V=s
         echo "Build completed!"
 
     - name: Upload firmware artifact
