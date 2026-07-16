@@ -101,50 +101,6 @@ define Build/append-openwrt-one-eeprom
 	dd if=$(STAGING_DIR_IMAGE)/mt7981_eeprom_mt7976_dbdc.bin >> $@
 endef
 
-define Build/mstc-header
-  $(eval version=$(word 1,$(1)))
-  $(eval magic=$(word 2,$(1)))
-  gzip -c $@ | tail -c8 > $@.crclen
-  ( \
-    printf "$(magic)"; \
-    tail -c+5 $@.crclen; head -c4 $@.crclen; \
-    dd if=/dev/zero bs=4 count=2; \
-    printf "$(version)" | dd bs=56 count=1 conv=sync 2>/dev/null; \
-    dd if=/dev/zero bs=$$((0x20000 - 0x84)) count=1 conv=sync 2>/dev/null | \
-      tr "\0" "\377"; \
-    cat $@; \
-  ) > $@.new
-  mv $@.new $@
-endef
-
-define Build/zyxel-nwa-fit-filogic
-	$(TOPDIR)/scripts/mkits-zyxel-fit-filogic.sh \
-		$@.its $@ "80 e1 81 e1 ff ff ff ff ff ff"
-	PATH=$(LINUX_DIR)/scripts/dtc:$(PATH) mkimage -f $@.its $@.new
-	@mv $@.new $@
-endef
-
-define Build/cetron-header
-	$(eval magic=$(word 1,$(1)))
-	$(eval model=$(word 2,$(1)))
-	( \
-		dd if=/dev/zero bs=856 count=1 2>/dev/null; \
-		printf "$(model)," | dd bs=128 count=1 conv=sync 2>/dev/null; \
-		md5sum $@ | cut -f1 -d" " | dd bs=32 count=1 2>/dev/null; \
-		printf "$(magic)" | dd bs=4 count=1 conv=sync 2>/dev/null; \
-		cat $@; \
-	) > $@.tmp
-	fw_crc=$$(gzip -c $@.tmp | tail -c 8 | od -An -N4 -tx4 --endian little | tr -d ' \n'); \
-	printf "$$(echo $$fw_crc | sed 's/../\\x&/g')" | cat - $@.tmp > $@
-	rm $@.tmp
-endef
-
-define Build/tenda-mkdualimageheader
-	printf '%b' "\x47\x6f\x64\x31\x00\x00\x00\x00" >"$@.new"
-	gzip -c "$@" | tail -c8 >>"$@.new"
-	cat "$@" >>"$@.new"
-	mv "$@.new" "$@"
-endef
 
 define Device/tplink_wma301
   DEVICE_VENDOR := TP-Link

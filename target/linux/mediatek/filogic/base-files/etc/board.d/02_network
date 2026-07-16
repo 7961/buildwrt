@@ -60,7 +60,7 @@ mediatek_setup_interfaces()
 	netis,nx32u|\
 	qihoo,360t7|\
 	qihoo,360t7-ubi|\
-	tplink,wma301*|\
+	tplink,wma301|\
 	routerich,ax3000|\
 	routerich,ax3000-ubootmod|\
 	routerich,be7200|\
@@ -311,10 +311,10 @@ mediatek_setup_macs()
 		lan_mac=$(strings /dev/mtd11 | grep 'option macaddr' | awk -F"'" '{print $2}')
 		wan_mac="$(macaddr_add $lan_mac 1)"
 		;;
-	tplink,wma301*)
+	tplink,wma301)
 	    lan_mac=$(mtd_get_mac_binary "factory" 0x1c)
 		wan_mac=$(macaddr_add "$lan_mac" 1)
-		label_mac=$wan_mac
+		label_mac=$lan_mac
 		;;
 	xiaomi,mi-router-ax3000t|\
 	xiaomi,mi-router-ax3000t-ubootmod|\
