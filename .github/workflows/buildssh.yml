@@ -3,7 +3,7 @@ on: workflow_dispatch
 
 jobs:
   build:
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout
@@ -52,8 +52,7 @@ jobs:
         ./scripts/feeds install -a
         
     - name: Start SSH service
-      uses: mxschmitt/action-tmate@v3
-      timeout-minutes: 40
+      uses: mxschmitt/action-tmate@v3.24
 
     - name: show config(diff)
       run: |
