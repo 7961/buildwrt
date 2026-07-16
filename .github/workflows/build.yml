@@ -51,6 +51,9 @@ jobs:
         sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301*|\\' openwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
         sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301|\\' openwrt/package/boot/uboot-tools/uboot-envtools/files/mediatek_filogic
         mv -f target/linux/mediatek/image/filogic.mk openwrt/target/linux/mediatek/image/
+        mkdir -p openwrt/files/etc/uci-defaults
+        mv -f 99-custom openwrt/files/etc/uci-defaults/
+        cat openwrt/files/etc/uci-defaults/99-custom
 
                
     - name: Load custom config
