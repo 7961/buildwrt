@@ -39,9 +39,8 @@ jobs:
 
     - name: Clone source code
       run: |
-        git clone https://github.com/openwrt/openwrt.git openwrt
+        git clone -b v25.12.5 --single-branch --depth=1 https://github.com/openwrt/openwrt.git
         cd openwrt
-        git checkout v25.12.5
         git status
         
     - name: load custom files
@@ -50,6 +49,7 @@ jobs:
         mv -f target/linux/mediatek/filogic/base-files/etc/board.d/02_network openwrt/target/linux/mediatek/filogic/base-files/etc/board.d/
         mv -f target/linux/mediatek/filogic/base-files/etc/hotplug.d/ieee80211/11_fix_wifi_mac openwrt/target/linux/mediatek/filogic/base-files/etc//hotplug.d/ieee80211/
         sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301*|\\' openwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
+        sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301|\\' openwrt/package/boot/uboot-tools/uboot-envtools/files/mediatek_filogic
         mv -f target/linux/mediatek/image/filogic.mk openwrt/target/linux/mediatek/image/
 
                

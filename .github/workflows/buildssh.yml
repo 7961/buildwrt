@@ -29,9 +29,8 @@ jobs:
 
     - name: Clone source code
       run: |
-        git clone https://github.com/openwrt/openwrt.git openwrt
+        git clone -b v25.12.5 --single-branch --depth=1 https://github.com/openwrt/openwrt.git
         cd openwrt
-        git checkout v25.12.5
         git status
               
     - name: load custom files
