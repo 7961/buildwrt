@@ -58,18 +58,16 @@ jobs:
                
     - name: Load custom config
       run: |
-        cp -f wma301.config openwrt/.config
+        cd openwrt
+        cat $GITHUB_WORKSPACE/wma301.config >> .config
+        make defconfig
+        make clean
 
     - name: Update feeds
       run: |
         cd openwrt
         ./scripts/feeds update -a
         ./scripts/feeds install -a
-
-    - name: Generate config
-      run: |
-        cd openwrt
-        make defconfig
 
     - name: Show build config
       run: |
