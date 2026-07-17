@@ -3677,13 +3677,8 @@ define Device/tplink_wma301
   BLOCKSIZE := 128k
   PAGESIZE := 2048
   KERNEL_IN_UBI := 1
+  IMAGE_SIZE := 114688k
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-  KERNEL := kernel-bin | lzma
-  KERNEL_INITRAMFS := kernel-bin | lzma | \
-        fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd
-  IMAGES += sysupgrade.itb
-  IMAGE/sysupgrade.itb := append-kernel | \
-        fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | append-metadata
 endef
 TARGET_DEVICES += tplink_wma301
 

@@ -39,7 +39,6 @@ jobs:
         mv -f target/linux/mediatek/filogic/base-files/etc/board.d/02_network openwrt/target/linux/mediatek/filogic/base-files/etc/board.d/
         mv -f target/linux/mediatek/filogic/base-files/etc/hotplug.d/ieee80211/11_fix_wifi_mac openwrt/target/linux/mediatek/filogic/base-files/etc//hotplug.d/ieee80211/
         sed -i '/tplink,tl-xtr8488/a\\ttplink,wma301|\\' openwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
-        sed -i '/tplink,tl-xtr8488/a\tplink,wma301|\\' openwrt/package/boot/uboot-tools/uboot-envtools/files/mediatek_filogic
         mv -f target/linux/mediatek/image/filogic.mk openwrt/target/linux/mediatek/image/
         mkdir -p openwrt/files/etc/uci-defaults
         mv -f 99-custom openwrt/files/etc/uci-defaults/

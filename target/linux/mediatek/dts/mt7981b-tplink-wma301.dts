@@ -19,8 +19,7 @@
 &partitions {
 	partition@700000 {
 		label = "ubi";
-		compatible = "linux,ubi";
-		reg = <0x0700000 0x6F00000>;
+		reg = <0x0700000 0x7000000>;
 	};
 };
 
