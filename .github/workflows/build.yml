@@ -43,6 +43,12 @@ jobs:
         cd openwrt
         git status
         
+    - name: Update feeds
+      run: |
+        cd openwrt
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+        
     - name: load custom files
       run: |
         mv -f target/linux/mediatek/dts/* openwrt/target/linux/mediatek/dts/
@@ -54,7 +60,6 @@ jobs:
         mkdir -p openwrt/files/etc/uci-defaults
         mv -f 99-custom openwrt/files/etc/uci-defaults/
         cat openwrt/files/etc/uci-defaults/99-custom
-
                
     - name: Load custom config
       run: |
@@ -62,12 +67,6 @@ jobs:
         cat $GITHUB_WORKSPACE/wma301.config >> .config
         make defconfig
         make clean
-
-    - name: Update feeds
-      run: |
-        cd openwrt
-        ./scripts/feeds update -a
-        ./scripts/feeds install -a
 
     - name: Show build config
       run: |
