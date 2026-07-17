@@ -67,7 +67,15 @@ jobs:
         
     - name: Show build config
       run: |
-        cat openwrt/.config
+        cd openwrt
+        cat .config >> 301.config
+        
+    - name: Upload config before build
+      uses: actions/upload-artifact@v4
+      with:
+          name: config-before-build
+          path: |
+            openwrt/301.config
 
     - name: Download packages
       run: |
