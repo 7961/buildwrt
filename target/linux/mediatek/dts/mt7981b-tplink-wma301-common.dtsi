@@ -22,6 +22,7 @@
 
 	memory {
 		reg = <0 0x40000000 0 0x10000000>;
+		device_type = "memory";
 	};
 
 	gpio-keys {
@@ -188,6 +189,9 @@
 		port@3 {
 			reg = <3>;
 			label = "wan";
+			
+			nvmem-cells = <&macaddr_lan 1>;
+			nvmem-cell-names = "mac-address";
 		};
 
 		port@6 {
@@ -234,7 +238,21 @@
 };
 
 &wifi {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	nvmem-cells = <&eeprom_wifi>;
 	nvmem-cell-names = "eeprom";
 	status = "okay";
+	
+	band@0 {
+		reg = <0>;
+		nvmem-cells = <&macaddr_lan 2>;
+		nvmem-cell-names = "mac-address";
+	};
+
+	band@1 {
+		reg = <1>;
+		nvmem-cells = <&macaddr_lan 3>;
+		nvmem-cell-names = "mac-address";
+	};
 };
