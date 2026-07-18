@@ -3668,7 +3668,7 @@ TARGET_DEVICES += zyxel_wx5600-t0-ubootmod
 
 define Device/tplink_wma301-nmbm
   DEVICE_VENDOR := TP-Link
-  DEVICE_MODEL := WMA301
+  DEVICE_MODEL := WMA301 (NMBM 112M layout)
   DEVICE_DTS := mt7981b-tplink-wma301-nmbm
   DEVICE_DTS_DIR := ../dts
   SUPPORTED_DEVICES += mediatek,mt7981-spim-snand-rfb
@@ -3682,11 +3682,11 @@ define Device/tplink_wma301-nmbm
   IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 endef
-TARGET_DEVICES += SUPPORTED_DEVICES_wma301-nmbm
+TARGET_DEVICES += tplink_wma301-nmbm
 
 define Device/tplink_wma301-ubootmod
   DEVICE_VENDOR := TP-Link
-  DEVICE_MODEL := WMA301
+  DEVICE_MODEL := WMA301 (OpenWrt U-Boot layout)
   DEVICE_DTS := mt7981b-tplink-wma301-ubootmod
   DEVICE_DTS_DIR := ../dts
   SUPPORTED_DEVICES += tplink,wma301
