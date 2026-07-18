@@ -60,9 +60,10 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         
-    - name: install feeds 2
+    - name: Update feeds 2
       run: |
         cd openwrt
+        ./scripts/feeds update -a
         ./scripts/feeds install -a
                
     - name: Load custom config

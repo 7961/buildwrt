@@ -44,15 +44,17 @@
 	leds {
 		compatible = "gpio-leds";
 
-		led_status_red: red {
+		led_status_green: green {
+			label = "greenled";
+			color = <LED_COLOR_ID_GREEN>;
 			function = LED_FUNCTION_STATUS;
-			color = <LED_COLOR_ID_RED>;
 			gpios = <&pio 14 GPIO_ACTIVE_LOW>;
 		};
 
-		led_status_green: green {
+		led_status_red: red {
+			label = "redled";
+			color = <LED_COLOR_ID_RED>;
 			function = LED_FUNCTION_STATUS;
-			color = <LED_COLOR_ID_GREEN>;
 			gpios = <&pio 15 GPIO_ACTIVE_LOW>;
 		};
 	};

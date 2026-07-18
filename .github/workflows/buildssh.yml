@@ -30,8 +30,7 @@ jobs:
     - name: Clone source code
       run: |
         git clone -b v25.12.5 --single-branch --depth=1 https://github.com/openwrt/openwrt.git
-        cd openwrt
-        git status
+        git clone git@github.com:gSpotx2f/luci-app-temp-status.git openwrt/package/luci-app-temp-status
               
     - name: load custom files
       run: |
@@ -46,6 +45,12 @@ jobs:
         cat openwrt/files/etc/uci-defaults/99-custom
         
     - name: Update feeds
+      run: |
+        cd openwrt
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+
+    - name: Update feeds 2
       run: |
         cd openwrt
         ./scripts/feeds update -a
