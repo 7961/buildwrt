@@ -40,8 +40,8 @@ jobs:
     - name: Clone source code
       run: |
         git clone -b v25.12.5 --single-branch --depth=1 https://github.com/openwrt/openwrt.git
-        cd openwrt
-        git status
+        git clone https://github.com/7961/luci-app-temp-status.git openwrt/package/luci-app-temp-status
+        git clone https://github.com/gSpotx2f/luci-app-cpu-status.git openwrt/package/luci-app-cpu-status
         
     - name: load custom files
       run: |
