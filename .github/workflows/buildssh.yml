@@ -38,7 +38,7 @@ jobs:
         mv -f target/linux/mediatek/dts/* openwrt/target/linux/mediatek/dts/
         sed -i '/cmcc,a10-ubootmod/a\\ttplink,wma301-ubootmod|\\' openwrt/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
         sed -i '/cmcc,a10-ubootmod/a\\ttplink,wma301-nmbm|\\' openwrt/target/linux/mediatek/filogic/base-files/etc/board.d/02_network
-        sed -i '/cmcc,a10-nmbm/a\\ttplink,wma301-ubootmod|\\' openwrt/target/linux/mediatek/filogic/base-files/etc/board.d/02_network
+        sed -i '/tplink,wma301-nmbm/a\\ttplink,wma301-ubootmod|\\' openwrt/target/linux/mediatek/filogic/base-files/etc/board.d/02_network
         sed -i '/cmcc,a10-ubootmod/a\tplink,wma301-ubootmod|\\' openwrt/package/boot/uboot-tools/uboot-envtools/files/mediatek_filogic
         mv -f target/linux/mediatek/image/filogic.mk openwrt/target/linux/mediatek/image/
         mkdir -p openwrt/files/etc/uci-defaults
