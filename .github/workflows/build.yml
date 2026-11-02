@@ -39,8 +39,8 @@ jobs:
 
     - name: Clone source code
       run: |
-        git clone -b v25.12.5 --single-branch --depth=1 https://github.com/openwrt/openwrt.git
-        git clone https://github.com/7961/luci-app-temp-status.git openwrt/package/luci-app-temp-status
+        git clone -b v25.12.6 --single-branch --depth=1 https://github.com/openwrt/openwrt.git
+        git clone https://github.com/gSpotx2f/luci-app-temp-status.git openwrt/package/luci-app-temp-status
         git clone https://github.com/gSpotx2f/luci-app-cpu-status.git openwrt/package/luci-app-cpu-status
         
     - name: load custom files
@@ -121,12 +121,14 @@ jobs:
       id: release_info
       run: |
         SOURCE_COMMIT=$(cd openwrt && git rev-parse --short HEAD)
+        SOURCE_TAG=$(cd openwrt && git describe --tags --always 2>/dev/null || echo "unknown")
         BUILD_DATE=$(date +"%Y%m%d")
         TAG_NAME="v${BUILD_DATE}-${SOURCE_COMMIT}"
-        RELEASE_TITLE="WMA301-V2 ${BUILD_DATE} (${SOURCE_COMMIT})"
+        RELEASE_TITLE="WMA301-V2 ${BUILD_DATE} (${SOURCE_TAG})"
         echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
         echo "release_title=$RELEASE_TITLE" >> $GITHUB_OUTPUT
         echo "source_commit=$SOURCE_COMMIT" >> $GITHUB_OUTPUT
+        echo "source_tag=$SOURCE_TAG" >> $GITHUB_OUTPUT
 
     - name: Upload firmware to Release
       uses: softprops/action-gh-release@v2
@@ -138,6 +140,7 @@ jobs:
           ## TP-Link WMA301-V2 OPENWRT 固件
 
           - **构建日期**: ${{ steps.release_info.outputs.release_title }}
+          - **版本**: ${{ steps.release_info.outputs.source_tag }}
           - **源码 Commit**: `${{ steps.release_info.outputs.source_commit }}`
           - **设备**: TP-Link WMA301-V2.0 (MT7981, filogic)
           - **Workflow Run**: [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
